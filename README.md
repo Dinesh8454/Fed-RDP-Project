@@ -1,153 +1,117 @@
-Conversation opened. 1 unread message.
+# 🔐 Federated Learning with Adaptive Differential Privacy (Fed-RDP)
 
-Skip to content
-Using Gmail with screen readers
-1 of 1,189
-(no subject)
-Inbox
-Summarize this email
+## 📌 Project Overview
+This project implements a **privacy-preserving Federated Learning system** using **Adaptive Differential Privacy (DP)** and **contribution-based noise scaling**.
 
-dinesh swamy goruputi | AP22110010960
-1:59 PM (0 minutes ago)
-to me
+The goal is to:
+- Protect user data privacy
+- Improve model robustness
+- Handle malicious or low-quality clients
+- Maintain model accuracy while ensuring privacy
 
-Fed-RDP: Robust Federated Learning with Reputation & Differential Privacy
-This repository contains an implementation of the Fed-RDP framework, a robust federated learning approach that combines contribution evaluation, reputation-based aggregation, and differential privacy (DP).
-The implementation supports MNIST, CIFAR-10, and SVHN datasets and is fully runnable using Docker + Ray.
-📌 Project Overview
-Traditional federated learning (FL) (e.g., FedAvg) assumes all clients are honest and does not protect against:
-Malicious or low-quality clients
-Privacy leakage from model updates
-Fed-RDP addresses this by:
-Evaluating client contributions using similarity-based scores
-Assigning reputation weights to clients
-Applying Differential Privacy (DP) noise to model updates
-Aggregating models using weighted sums instead of simple averaging
-🧠 What We Implemented
-Models & Methods
-We implemented and compared:
-Centralized / Base Model (DL) – Single-node training
-FedAvg – Standard federated averaging
-Fed-RDP – Federated learning with:
-Contribution evaluation
-Reputation-based aggregation
-Differential Privacy (Gaussian noise)
-Supported Datasets
-MNIST
-CIFAR-10
-SVHN
-🏗️ Repository Structure
-Copy code
+---
 
+## 🚀 Key Concepts Used
+
+### 🔹 Federated Learning (FL)
+- Training happens on **multiple clients locally**
+- Only model updates are shared (not raw data)
+
+### 🔹 Differential Privacy (DP)
+- Adds **Gaussian noise** to model updates
+- Protects individual data from being inferred
+
+### 🔹 Adaptive Noise Scaling (Our Novelty)
+- Noise level (σ) changes based on client contribution:
+  - High contribution → Low noise
+  - Low contribution → High noise
+
+### 🔹 Contribution Score
+- Measures how useful each client update is
+- Used for:
+  - Noise scaling
+  - Weighted aggregation
+
+---
+
+## 🧠 System Architecture
+
+1. Server initializes global model  
+2. Sends model to clients  
+3. Clients train locally  
+4. Compute update (Δ = Local - Global)  
+5. Add adaptive noise  
+6. Send updates to server  
+7. Server aggregates updates  
+8. Repeat for multiple rounds  
+
+---
+## 📂 Project Structure
 ray-fed-basic/
 │
-├── client.py # Client-side training & DP noise
-├── run_experiment.py # Server orchestration (rounds, aggregation)
-├── datasets.py # MNIST / CIFAR-10 / SVHN loaders
-├── contribute_eval.py # Contribution & similarity scoring
-├── reputation.py # Reputation calculation
-├── ledger.py # Logging scores & weights
-├── utils.py # DP noise & helper functions
-├── Dockerfile # Docker environment
-├── requirements.txt
-├── outputs_* # Saved plots & logs
-└── README.md
-🐳 Running the Project (Docker)
-1️⃣ Build Docker Image
-Copy code
-Bash
-docker build -t team-python-env:local .
-2️⃣ Start Docker Container
-Copy code
-Bash
-docker run --rm -it --shm-size=5.0gb \
-  -e RAY_ACCEL_ENV_VAR_OVERRIDE_ON_ZERO=0 \
-  -v "${PWD}:/app" \
-  team-python-env:local bash
-▶️ Running Experiments
-MNIST – Fed-RDP
-Copy code
-Bash
-python3 run_experiment.py \
-  --dataset mnist \
-  --clients 3 \
-  --rounds 10 \
-  --local-epochs 1 \
-  --dp \
-  --contrib similarity \
-  --outdir outputs_rdp_mnist
-CIFAR-10 – Fed-RDP
-Copy code
-Bash
-python3 run_experiment.py \
-  --dataset cifar10 \
-  --clients 3 \
-  --rounds 10 \
-  --local-epochs 1 \
-  --dp \
-  --contrib similarity \
-  --outdir outputs_rdp_cifar10
-SVHN – Fed-RDP
-Copy code
-Bash
-python3 run_experiment.py \
-  --dataset svhn \
-  --clients 3 \
-  --rounds 10 \
-  --local-epochs 1 \
-  --dp \
-  --contrib similarity \
-  --outdir outputs_rdp_svhn
-🧾 Command Arguments Explained
-Argument
-Meaning
---dataset
-Dataset name (mnist / cifar10 / svhn)
---clients
-Number of federated clients
---rounds
-Number of communication rounds
---local-epochs
-Epochs each client trains locally per round
---dp
-Enables Differential Privacy
---contrib similarity
-Contribution evaluation method
---outdir
-Folder to save outputs & plots
-🔄 What Happens During Training
-Round starts
-Server sends global model to all clients
-Each client:
-Trains locally (local-epochs)
-Computes update (delta)
-Adds DP noise (if enabled)
-Server:
-Computes contribution scores
-Updates client reputation
-Aggregates models using weighted sum
-Accuracy & loss are logged
-Next round begins
-📊 Outputs Generated
-Each run saves results in the specified outdir:
-accuracy_vs_round.png
-scores_vs_round.png
-ledger.json (scores, weights, metadata)
-These plots replicate the graphs shown in the reference Fed-RDP paper, such as:
-Score fluctuations across rounds
-Weighted sum comparisons
-DP noise impact
-🔐 Differential Privacy (DP)
-Noise Type: Gaussian noise
-Where added: Client-side model updates
-Effect:
-Higher privacy protection
-Increased loss
-Slight decrease in accuracy (expected & correct behavior)
-This matches prior research and the original Fed-RDP paper results.
-📈 Observations
-MNIST converges smoothly
-CIFAR-10 & SVHN show higher loss due to:
-Complex data
-DP noise accumulation
-Increasing loss with DP is expected and acceptable
+├── run_experiment.py # Main execution file
+├── client.py # Client-side training
+├── model.py # CNN model definition
+├── datasets.py # Dataset loading
+├── reputation.py # Contribution scoring
+├── weight_sum.py # Aggregation logic
+├── utils.py # Helper functions
+├── ledger.py # Stores updates (blockchain-like)
+├── plot_*.py # Graph generation
+├── requirements.txt # Dependencies
+├── README.md
+
+
+---
+
+## 📊 Datasets Used
+
+- MNIST (Handwritten digits)
+- CIFAR-10 (Image classification)
+- SVHN (Street View House Numbers)
+
+---
+
+## 📈 Evaluation Metrics
+
+- Accuracy vs Rounds
+- Contribution Score
+- Stability
+- DP Error Impact
+- Training Time
+
+---
+
+## ⚙️ Installation
+
+### Step 1: Clone Repository
+```bash
+git clone https://github.com/Dinesh8454/Fed-RDP-Project.git
+cd Fed-RDP-Project
+Step 2: Create Virtual Environment (Optional)
+python -m venv venv
+venv\Scripts\activate   # Windows
+Step 3: Install Requirements
+pip install -r requirements.txt
+▶️ How to Run
+🔹 Basic Run (MNIST)
+python run_experiment.py --dataset mnist --clients 3 --rounds 10
+🔹 With Differential Privacy
+python run_experiment.py --dataset mnist --clients 3 --rounds 10 --dp
+🔹 Adaptive DP (Our Proposed Model)
+python run_experiment.py --dataset mnist --clients 3 --rounds 10 --dp --adaptive
+📊 Output
+After running, outputs are saved in:
+
+outputs/
+Includes:
+
+Accuracy vs rounds graph
+
+Contribution scores
+
+Stability plots
+
+JSON logs (ledger)
+
+## 📂 Project Structure
