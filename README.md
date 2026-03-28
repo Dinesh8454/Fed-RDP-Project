@@ -21,7 +21,7 @@ The goal is to:
 - Adds **Gaussian noise** to model updates
 - Protects individual data from being inferred
 
-### 🔹 Adaptive Noise Scaling (Our Novelty)
+### 🔹 Adaptive Noise Scaling
 - Noise level (σ) changes based on client contribution:
   - High contribution → Low noise
   - Low contribution → High noise
